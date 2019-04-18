@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Mashup Project</title>
+	<style>
+		#map {
+			height: 100%;
+            width: 50%;
+		}
+        #weather {
+			height: 100%;
+            width: 50%;
+		}
+        div{
+            float:left;
+        }
+        .clear{
+            clear:both;
+        }
+		/* Optional: Makes the sample page fill the window. */
+		html, body {
+			height: 100%;
+			margin: 0;
+			padding: 0;
+		}
+        table{
+            margin:0 auto;
+        }
+    </style>
+    <script async defer
+           src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDgYFOmoJEWPU65OD0eO7x8IPQEJc-KnqY&callback=initMap">
+    </script>
+</head>
+<body>
+<div id="map"></div>
+<div id="weather"></div>
+<div class="clear"></div>
+<script>
+	var map;
+    var latitude=43.73;
+    var longitude= -79.74;
+    // initializing map
+	function initMap() {
+		map = new google.maps.Map(document.getElementById('map'), {
+			zoom: 2,
+			center: new google.maps.LatLng(44, -110),
+			mapTypeId: 'terrain'
+    	});
+        weatherData(latitude,longitude)
+
+         //Add listener to get coordinates on cliking Map
+        google.maps.event.addListener(map, "click", function (event) {
+            latitude = event.latLng.lat();
+            longitude = event.latLng.lng();
+            //console.log( latitude + ', ' + longitude );
+            weatherData(latitude,longitude)
+        }); 
+    }
+    
+    //to get Weather iformation according clicking on map
+    function weatherData(latitude,longitude){
+         var request;
+        if(window.XMLHttpRequest){
+            request= new XMLHttpRequest();
+        }
+        else{
+            request=new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        request.open('GET','http://api.openweathermap.org/data/2.5/weather?lat='+latitude+'&lon='+longitude+'&APPID=6169f7816129125523e300f5f58e5b51');
+        request.onreadystatechange=function (){
+            if( request.readyState==4 &&request.status==200){
+                var info=JSON.parse(request.responseText);
+               // console.log(info);
+                var output="<h1>&nbsp;Weather Info</h1>"
+                    output+="<table><tr><td>"
+                    output+="<h2>"+info.name+"</h2>"
+                    output+="<h3>Temp:"+Math.round(info.main.temp-273.15,0)+" Cel</h3>"
+                    output+="<h3>"+info.weather[0].description+"</h3>"
+                    output+="</td></tr></table>";
+                document.getElementById('weather').innerHTML=output;
+            }
+        }
+        request.send();
+   }
+
+</script>
+</body>
+</html>
